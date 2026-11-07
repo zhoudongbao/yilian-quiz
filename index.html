@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>依恋类型测试｜本地版</title>
+<meta name="description" content="35 题依恋类型自测。结果在本机计算与保存，不上传服务器。">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#ffffff; --ink:#111827; --ink-soft:#374151; --muted:#6b7280;
+    --line:#e5e7eb; --line-soft:#f1f3f6; --primary:#2563eb; --primary-weak:#eff6ff;
+    --danger:#dc2626; --radius:16px;
+    --safe:207,64%,59%; --anx:25,95%,53%; --avo:142,71%,45%; --dis:280,65%,60%; --mix:195,53%,65%;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+    font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:32px 18px 64px}
+  .screen{display:none; animation:rise .32s ease both}
+  .screen.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){ .screen{animation:none} *{transition:none!important} }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:28px; box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  .card + .card{margin-top:16px}
+  .card.is-type{border-width:2px}
+
+  .hero{text-align:center; padding:8px 0 4px}
+  .hero .badge{
+    width:68px;height:68px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+    background:rgba(37,99,235,.09); margin-bottom:14px;
+  }
+  .hero .badge svg{width:32px;height:32px;stroke:var(--primary)}
+  h1{margin:0 0 6px; font-size:clamp(26px,5.2vw,34px); line-height:1.25; letter-spacing:.5px; font-weight:700}
+  .sub{margin:0; color:var(--muted); font-size:15px}
+
+  h2{margin:0 0 4px; font-size:18px; line-height:1.4}
+  .h2hint{margin:0 0 16px; color:var(--muted); font-size:14px}
+  .section-title{display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:16px;font-weight:600}
+  .section-title svg{width:18px;height:18px;stroke:var(--primary)}
+
+  .types{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px}
+  .type{background:#fafbfc; border:1px solid var(--line-soft); border-radius:12px; padding:16px 12px; text-align:center}
+  .type .ico{
+    width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px;
+  }
+  .type .ico svg{width:20px;height:20px}
+  .type b{display:block; font-size:14px; margin-bottom:4px}
+  .type span{display:block; color:var(--muted); font-size:12.5px; line-height:1.5}
+
+  .notes{margin:0; padding:0; list-style:none}
+  .notes li{position:relative; padding-left:16px; margin:8px 0; color:var(--ink-soft); font-size:14px}
+  .notes li::before{content:""; position:absolute; left:2px; top:.62em; width:5px; height:5px; border-radius:50%; background:var(--primary)}
+
+  .btn{
+    appearance:none; border:1px solid transparent; border-radius:11px; padding:11px 20px;
+    font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; line-height:1.2;
+    background:var(--primary); color:#fff; transition:background .15s, border-color .15s, color .15s;
+  }
+  .btn:hover{background:#1d4ed8}
+  .btn:focus-visible{outline:3px solid rgba(37,99,235,.3); outline-offset:2px}
+  .btn.ghost{background:#fff; color:var(--ink-soft); border-color:var(--line)}
+  .btn.ghost:hover{background:#fafbfc; color:var(--ink)}
+  .btn[disabled]{opacity:.45; cursor:not-allowed}
+  .btn-lg{padding:13px 30px; font-size:16px}
+  .btn-row{display:flex; gap:10px; justify-content:space-between; align-items:center; margin-top:22px}
+  .center{text-align:center}
+
+  .link{background:none;border:none;padding:0;font:inherit;font-size:14px;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+  .link:hover{color:var(--ink)}
+
+  .disclaimer{margin:18px 0 0; text-align:center; color:var(--muted); font-size:12.5px}
+
+  /* test */
+  .progress-head{display:flex; justify-content:space-between; align-items:baseline; font-size:14px; color:var(--muted); margin-bottom:8px}
+  .track{height:6px; background:var(--line-soft); border-radius:99px; overflow:hidden}
+  .fill{height:100%; width:0; border-radius:99px; background:var(--primary); transition:width .25s ease}
+  .qnum{color:var(--muted); font-size:13px; letter-spacing:.4px; margin:0 0 6px}
+  .qtext{font-size:20px; font-weight:600; line-height:1.5; margin:0}
+  @media (max-width:480px){ .qtext{font-size:18px} }
+
+  .opts{margin:22px 0 0; padding:0; list-style:none; display:grid; gap:10px}
+  .opt{
+    display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left;
+    padding:14px 16px; border:1.5px solid var(--line); border-radius:12px; background:#fff;
+    font-family:inherit; font-size:15px; color:var(--ink-soft); line-height:1.55; cursor:pointer;
+    transition:border-color .15s, background .15s, color .15s;
+  }
+  .opt:hover{background:#fafbfc}
+  .opt:focus-visible{outline:3px solid rgba(37,99,235,.25); outline-offset:1px}
+  .dot{
+    flex:none; width:18px; height:18px; border-radius:50%; border:1.5px solid #c7cdd6;
+    margin-top:3px; position:relative; transition:border-color .15s;
+  }
+  .opt[aria-checked="true"]{border-color:var(--primary); background:var(--primary-weak); color:var(--ink)}
+  .opt[aria-checked="true"] .dot{border-color:var(--primary)}
+  .opt[aria-checked="true"] .dot::after{
+    content:""; position:absolute; inset:3px; border-radius:50%; background:var(--primary);
+  }
+  .hint{min-height:22px; margin:14px 0 0; font-size:14px; color:var(--danger)}
+
+  /* result */
+  .result-head{text-align:center; padding:4px 0}
+  .result-head .ico{
+    width:76px;height:76px;border-radius:50%; display:inline-flex;align-items:center;justify-content:center; margin-bottom:14px;
+  }
+  .result-head .ico svg{width:36px;height:36px}
+  .result-head h2{font-size:26px; margin:0 0 4px}
+  .result-head p{margin:0; color:var(--muted); font-size:15px}
+  .dominant{margin:14px 0 0; font-size:13.5px; color:var(--ink-soft); background:#fafbfc; border:1px dashed var(--line); border-radius:10px; display:inline-block; padding:6px 12px}
+
+  .bars{display:grid; gap:14px; margin-top:6px}
+  .bar-row .top{display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px}
+  .bar-row .top .val{font-weight:600; font-variant-numeric:tabular-nums}
+  .bar-row .track{height:8px}
+  .bar-row .fill{background:var(--c)}
+
+  .kv{margin:0; padding:0; list-style:none; display:grid; gap:9px}
+  .kv li{position:relative; padding-left:20px; font-size:14.5px; color:var(--ink-soft)}
+  .kv li::before{
+    content:""; position:absolute; left:4px; top:.55em; width:7px; height:7px; border-radius:50%;
+    background:rgba(37,99,235,.55);
+  }
+  .desc{margin:0; color:var(--ink-soft); font-size:15px}
+
+  .saved{
+    display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:#fafbfc; margin-top:20px;
+  }
+  .saved .txt{font-size:14px; color:var(--ink-soft)}
+  .saved .txt b{font-weight:600}
+
+  .toast{
+    position:fixed; left:50%; bottom:28px; transform:translate(-50%,16px);
+    background:#111827; color:#fff; font-size:13.5px; padding:9px 16px; border-radius:99px;
+    opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:50;
+  }
+  .toast.show{opacity:1; transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<noscript>
+  <div style="max-width:760px;margin:80px auto;padding:0 18px;text-align:center;color:#6b7280;font-size:15px">
+    本测试需要启用 JavaScript 才能运行，请在浏览器设置中允许 JavaScript 后刷新页面。
+  </div>
+</noscript>
+<div class="wrap">
+
+  <!-- ========== 首页 ========== -->
+  <section id="screen-home" class="screen active">
+    <div class="hero">
+      <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+      <h1>依恋类型测试</h1>
+      <p class="sub">了解你的依恋风格，探索亲密关系中的自己</p>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <h2>什么是依恋类型？</h2>
+      <p class="h2hint">依恋理论是心理学中重要的理论之一，描述了人们在亲密关系中的行为模式和情感反应方式。</p>
+      <div class="types" id="type-grid"></div>
+    </div>
+
+    <div class="card">
+      <h2>测试说明</h2>
+      <ul class="notes">
+        <li>本测试共包含 35 道题目，预计需要 5–8 分钟完成</li>
+        <li>请根据你在亲密关系中的真实感受和行为作答</li>
+        <li>没有对错之分，请选择最符合你实际情况的选项</li>
+        <li>测试结果将帮助你更好地了解自己的依恋模式</li>
+      </ul>
+    </div>
+
+    <div class="center" style="margin-top:24px">
+      <button class="btn btn-lg" id="btn-start">开始测试</button>
+      <div id="saved-box"></div>
+      <div style="margin-top:14px"><button class="btn ghost" id="btn-install" hidden>安装到桌面</button></div>
+      <p class="disclaimer">本测试仅供参考，不能替代专业心理咨询。结果仅保存在本机浏览器，不会上传任何服务器。</p>
+    </div>
+  </section>
+
+  <!-- ========== 答题 ========== -->
+  <section id="screen-test" class="screen">
+    <div class="progress-head">
+      <span id="q-counter"></span>
+      <span id="q-pct"></span>
+    </div>
+    <div class="track"><div class="fill" id="q-fill"></div></div>
+
+    <div class="card" style="margin-top:20px">
+      <p class="qnum" id="q-num"></p>
+      <p class="qtext" id="q-text"></p>
+      <ul class="opts" id="q-opts"></ul>
+      <p class="hint" id="q-hint" role="alert"></p>
+
+      <div class="btn-row">
+        <button class="btn ghost" id="btn-prev">上一题</button>
+        <button class="btn" id="btn-next">下一题</button>
+      </div>
+    </div>
+
+    <div class="center" style="margin-top:18px">
+      <button class="link" id="btn-quit">返回首页</button>
+    </div>
+  </section>
+
+  <!-- ========== 结果 ========== -->
+  <section id="screen-result" class="screen">
+    <div class="card is-type" id="res-head">
+      <div class="result-head">
+        <div class="ico" id="res-ico"></div>
+        <h2 id="res-title"></h2>
+        <p id="res-sub"></p>
+        <div id="res-dominant"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+        得分分布
+      </div>
+      <div class="bars" id="res-bars"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+        关于你的依恋类型
+      </div>
+      <p class="desc" id="res-desc"></p>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        你的特点
+      </div>
+      <ul class="kv" id="res-feats"></ul>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/></svg>
+        建议
+      </div>
+      <ul class="kv" id="res-sugg"></ul>
+    </div>
+
+    <div class="btn-row" style="justify-content:center; flex-wrap:wrap; margin-top:24px">
+      <button class="btn ghost" id="btn-again">重新测试</button>
+      <button class="btn ghost" id="btn-share">复制结果链接</button>
+      <button class="btn" id="btn-home">返回首页</button>
+    </div>
+    <p class="disclaimer">本测试仅供参考，不能替代专业心理咨询。</p>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+const QUIZ = {"questions":[{"id":1,"text":"当我需要情感支持时，我会：","options":[{"text":"主动向亲密的人寻求帮助","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"犹豫很久才会开口求助","scores":{"secure":1,"anxious":2,"avoidant":1,"disorganized":1}},{"text":"倾向于自己解决问题","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"感到混乱，不知道该怎么办","scores":{"secure":0,"anxious":1,"avoidant":0,"disorganized":3}}]},{"id":2,"text":"在亲密关系中，我通常：","options":[{"text":"感到舒适和安全","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"担心对方不够爱我","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"觉得需要保持一定距离","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"感到矛盾和不安，难以预测自己的反应","scores":{"secure":0,"anxious":1,"avoidant":1,"disorganized":3}}]},{"id":3,"text":"当伴侣没有及时回复我的消息时：","options":[{"text":"理解对方可能在忙，不会过度担心","scores":{"secure":3,"anxious":0,"avoidant":1,"disorganized":0}},{"text":"会感到焦虑，担心是不是做错了什么","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":1}},{"text":"不太在意，各忙各的","scores":{"secure":1,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"情绪反应不稳定，有时愤怒有时恐惧","scores":{"secure":0,"anxious":1,"avoidant":0,"disorganized":3}}]},{"id":4,"text":"对于表达自己的情感，我：","options":[{"text":"能够自然地表达感受","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"经常表达，希望得到回应","scores":{"secure":1,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"觉得表达情感很困难","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"表达方式混乱，自己也不理解自己的感受","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":5,"text":"当发生冲突时，我倾向于：","options":[{"text":"冷静沟通，寻找解决方案","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"情绪激动，担心关系破裂","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":1}},{"text":"回避冲突，需要独处空间","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"反应极端且不可预测","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":6,"text":"我对独处的态度是：","options":[{"text":"享受独处，但也珍惜相处时光","scores":{"secure":3,"anxious":0,"avoidant":1,"disorganized":0}},{"text":"独处时会感到孤独和不安","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"更喜欢独处，觉得更自在","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"对独处的感受极度矛盾和混乱","scores":{"secure":0,"anxious":1,"avoidant":1,"disorganized":3}}]},{"id":7,"text":"关于信任他人，我：","options":[{"text":"相信大多数人是善意的","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"需要不断确认对方的感情","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"很难完全信任别人","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"对信任感到恐惧和困惑","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":8,"text":"当伴侣需要独处时间时：","options":[{"text":"理解并尊重对方的需求","scores":{"secure":3,"anxious":0,"avoidant":1,"disorganized":0}},{"text":"感到被拒绝和不安","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":1}},{"text":"觉得很正常，自己也需要空间","scores":{"secure":2,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"反应不一致，有时理解有时崩溃","scores":{"secure":0,"anxious":1,"avoidant":0,"disorganized":3}}]},{"id":9,"text":"对于承诺，我的态度是：","options":[{"text":"愿意做出承诺并努力维持","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"渴望承诺，需要确定性","scores":{"secure":1,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"对承诺感到压力和束缚","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"对承诺感到极度恐惧和混乱","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":10,"text":"在关系中，我对亲密程度的感受是：","options":[{"text":"感到舒适，不会太近或太远","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"总觉得不够亲密","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"太亲密会让我不舒服","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"既渴望又恐惧亲密，感到混乱","scores":{"secure":0,"anxious":1,"avoidant":1,"disorganized":3}}]},{"id":11,"text":"当我感到脆弱时：","options":[{"text":"能够向信任的人展示脆弱","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"会过度依赖他人的安慰","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"会隐藏起来，不让人看见","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"行为失控，可能会伤害自己或他人","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":12,"text":"对于过去的恋爱经历：","options":[{"text":"能够客观看待，从中学习","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"经常回想，担心重蹈覆辙","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"不太愿意回忆或讨论","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"记忆混乱，充满创伤和痛苦","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":13,"text":"当伴侣与异性朋友交往时：","options":[{"text":"信任对方，不会过度担心","scores":{"secure":3,"anxious":0,"avoidant":1,"disorganized":0}},{"text":"会感到嫉妒和不安","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":1}},{"text":"不太在意，觉得是对方的自由","scores":{"secure":1,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"情绪反应激烈且难以控制","scores":{"secure":0,"anxious":1,"avoidant":0,"disorganized":3}}]},{"id":14,"text":"关于分享个人想法和感受：","options":[{"text":"能够自然地与亲密的人分享","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"经常分享，寻求认同","scores":{"secure":1,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"很少分享内心真实想法","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"分享时感到极度不安和混乱","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":15,"text":"在关系初期，我通常：","options":[{"text":"保持开放，逐步建立信任","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"投入很快，渴望快速发展","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"保持警惕，不轻易投入","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"行为矛盾，忽冷忽热","scores":{"secure":0,"anxious":1,"avoidant":1,"disorganized":3}}]},{"id":16,"text":"当关系出现问题时：","options":[{"text":"愿意面对并一起解决","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"过度焦虑，担心关系结束","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"倾向于逃避或结束关系","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"反应混乱，可能做出极端行为","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":17,"text":"对于伴侣的关心和照顾：","options":[{"text":"感激并能够接受","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"需要很多，永远不够","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"觉得不自在，想要保持独立","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"有时渴望有时排斥，反应不稳定","scores":{"secure":0,"anxious":1,"avoidant":1,"disorganized":3}}]},{"id":18,"text":"我对自己在关系中的价值感：","options":[{"text":"相信自己值得被爱","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"经常怀疑自己不够好","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"不太需要从关系中获得价值感","scores":{"secure":1,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"对自我价值感到极度困惑","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":19,"text":"当伴侣情绪低落时：","options":[{"text":"能够给予适当的支持和空间","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"会过度担心，想要立即解决","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"不太知道如何应对","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"感到恐慌，可能会逃避或攻击","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":20,"text":"关于未来规划：","options":[{"text":"愿意与伴侣一起规划未来","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"急于确定未来，需要保证","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"不喜欢做长远规划","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"对未来感到恐惧和迷茫","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":21,"text":"在表达需求方面：","options":[{"text":"能够清楚表达自己的需求","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"经常表达，希望被满足","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"很少表达，觉得不需要依赖他人","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"表达方式混乱，常常自相矛盾","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":22,"text":"对于关系的稳定性：","options":[{"text":"相信关系是稳定的","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"总是担心关系会结束","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"觉得关系本来就是暂时的","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"对关系稳定性感到极度不安","scores":{"secure":0,"anxious":1,"avoidant":0,"disorganized":3}}]},{"id":23,"text":"当需要做重要决定时：","options":[{"text":"会与伴侣商量，共同决定","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"很依赖对方的意见","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"更喜欢自己做决定","scores":{"secure":1,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"决策过程混乱，难以做出选择","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":24,"text":"对于身体接触（拥抱、牵手等）：","options":[{"text":"感到自然和舒适","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"非常需要，通过接触获得安全感","scores":{"secure":1,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"不太习惯，觉得有些不自在","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"反应极端，有时渴望有时强烈抗拒","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":25,"text":"关于童年与父母的关系：","options":[{"text":"总体来说是温暖和支持的","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"父母的关爱不稳定，时有时无","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":1}},{"text":"父母较少表达情感","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"童年经历创伤或虐待","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":26,"text":"当伴侣取得成就时：","options":[{"text":"真心为对方感到高兴","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"高兴但也担心对方会离开我","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"觉得与我无关","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"情绪反应混乱，难以理解自己的感受","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":27,"text":"对于关系中的界限：","options":[{"text":"能够建立健康的界限","scores":{"secure":3,"anxious":0,"avoidant":1,"disorganized":0}},{"text":"很难设立界限，容易过度付出","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"界限很清晰，保护自己的空间","scores":{"secure":1,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"界限混乱，时而过度亲密时而疏远","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":28,"text":"在争吵后：","options":[{"text":"能够主动和解，修复关系","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"急于和解，害怕关系破裂","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"需要很长时间才能恢复","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"可能会做出伤害关系的极端行为","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":29,"text":"对于伴侣的缺点：","options":[{"text":"能够接纳，没有人是完美的","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"容易忽视，过度理想化对方","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"会放大缺点，成为疏远的理由","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"对缺点的反应极端且不可预测","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":30,"text":"关于自我价值：","options":[{"text":"不依赖关系来定义自我价值","scores":{"secure":3,"anxious":0,"avoidant":1,"disorganized":0}},{"text":"很大程度上依赖伴侣的评价","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"主要从个人成就中获得价值感","scores":{"secure":1,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"自我价值感极度混乱和破碎","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":31,"text":"当感到被忽视时：","options":[{"text":"会直接沟通自己的感受","scores":{"secure":3,"anxious":1,"avoidant":0,"disorganized":0}},{"text":"感到非常痛苦，可能会过度反应","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":1}},{"text":"选择退缩，减少投入","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"可能会有自我伤害或攻击性行为","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":32,"text":"对于关系中的变化：","options":[{"text":"能够适应和接受变化","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"对变化感到焦虑和不安","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"变化让我想要退出关系","scores":{"secure":0,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"变化让我感到极度恐慌和失控","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":33,"text":"关于给予和接受爱：","options":[{"text":"能够平衡地给予和接受","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"给予很多，但觉得接受的不够","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"更习惯给予，不习惯接受","scores":{"secure":0,"anxious":1,"avoidant":3,"disorganized":0}},{"text":"对爱感到恐惧和困惑","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":34,"text":"在关系结束后：","options":[{"text":"虽然难过但能够逐渐走出来","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"非常痛苦，很难放下","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"能够快速恢复，继续生活","scores":{"secure":1,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"可能会有极端反应或长期创伤","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]},{"id":35,"text":"对于理想的关系，我期待：","options":[{"text":"相互支持、信任和尊重","scores":{"secure":3,"anxious":0,"avoidant":0,"disorganized":0}},{"text":"完全的融合和无条件的爱","scores":{"secure":0,"anxious":3,"avoidant":0,"disorganized":0}},{"text":"保持独立，各自有空间","scores":{"secure":1,"anxious":0,"avoidant":3,"disorganized":0}},{"text":"无法想象或感到恐惧","scores":{"secure":0,"anxious":0,"avoidant":0,"disorganized":3}}]}],"results":{"secure":{"type":"secure","title":"安全型依恋","subtitle":"信任与平衡的关系模式","description":"你拥有安全型依恋风格，这是最健康的依恋类型。你能够在关系中感到舒适和安全，既不会过度依赖他人，也不会刻意保持距离。你相信自己值得被爱，也相信他人是可靠的。","characteristics":["能够建立和维持健康的亲密关系","在关系中感到安全和舒适","能够自然地表达情感和需求","信任他人，也值得被信任","能够平衡独立性和亲密感","面对冲突时能够有效沟通","对自己和他人都有积极的看法"],"suggestions":["继续保持开放和真诚的沟通方式","在关系中保持这种健康的平衡","可以帮助伴侣建立更安全的依恋模式","在新关系中保持耐心，给予对方时间建立信任","继续培养自我觉察和情绪管理能力"],"color":"hsl(207, 64%, 59%)"},"anxious":{"type":"anxious","title":"焦虑型依恋","subtitle":"渴望亲密但担心被抛弃","description":"你倾向于焦虑型依恋风格。你非常渴望亲密关系，但同时又担心被抛弃或不被爱。你可能会过度关注伴侣的一举一动，需要频繁的确认和保证。这种模式可能源于早期不稳定的养育经历。","characteristics":["强烈渴望亲密和认可","对关系中的变化非常敏感","经常需要确认对方的感情","担心被抛弃或不被爱","可能会过度依赖伴侣","情绪波动较大","对自己的价值感不够确定"],"suggestions":["培养自我价值感，不要完全依赖他人的评价","学习情绪调节技巧，如正念冥想","给予伴侣适当的空间，避免过度粘人","练习自我安抚，建立内在的安全感","考虑寻求心理咨询，探索依恋模式的根源","培养独立的兴趣爱好和社交圈","学习识别和挑战负面的自动思维"],"color":"hsl(25, 95%, 53%)"},"avoidant":{"type":"avoidant","title":"回避型依恋","subtitle":"重视独立，害怕过度亲密","description":"你倾向于回避型依恋风格。你重视独立和自主，可能会在关系变得太亲密时感到不适。你倾向于压抑情感，不太愿意依赖他人或让他人依赖你。这可能与早期学会自我依赖有关。","characteristics":["重视独立和自主性","不太习惯表达情感","在关系过于亲密时感到不适","倾向于情感疏离","很少寻求他人的帮助","可能会用工作或其他事情来回避亲密","对承诺感到压力"],"suggestions":["练习识别和表达自己的情感","尝试逐步增加对他人的信任","认识到脆弱不等于软弱","学习接受他人的关心和支持","探索亲密关系带来的积极面","与伴侣沟通你对空间的需求","考虑心理咨询，探索对亲密的恐惧"],"color":"hsl(142, 71%, 45%)"},"disorganized":{"type":"disorganized","title":"混乱型依恋","subtitle":"矛盾冲突的关系模式","description":"你表现出混乱型依恋特征。这种依恋风格通常与早期创伤经历有关，你可能在关系中感到极度矛盾和不安。你既渴望亲密又害怕受伤，行为模式可能不稳定且难以预测。这种依恋类型需要专业的心理支持。","characteristics":["对亲密关系有强烈的矛盾感受","情绪反应极端且不可预测","可能有创伤性的童年经历","对信任感到极度恐惧和困惑","行为模式混乱，忽冷忽热","可能会有自我伤害或攻击性行为","对自我价值感到极度困惑","难以调节情绪和建立稳定关系"],"suggestions":["强烈建议寻求专业心理咨询或治疗","考虑创伤聚焦治疗（如EMDR）","学习情绪调节和自我安抚技巧","建立安全的支持系统","给自己时间，改变需要过程","练习自我同情，接纳自己的感受","在专业指导下逐步处理创伤经历","学习识别触发因素，建立应对策略"],"color":"hsl(280, 65%, 60%)"},"mixed":{"type":"mixed","title":"混合型依恋","subtitle":"多种依恋特征的组合","description":"你的测试结果显示出多种依恋风格的特征。这可能意味着你在不同情境或与不同的人相处时，会表现出不同的依恋模式。这是正常的，因为依恋风格并非固定不变。","characteristics":["在不同情境下表现不同","依恋模式较为灵活","可能正在转变中","对不同的人有不同的依恋反应","具有多种依恋特征"],"suggestions":["观察自己在不同关系中的模式","识别哪些情境会触发不同的反应","朝着更安全的依恋风格努力","保持自我觉察和反思","如有需要，寻求专业指导"],"color":"hsl(195, 53%, 65%)"}}};
+
+const ORDER = ['secure','anxious','avoidant','disorganized'];
+const SHORT = {secure:'安全型', anxious:'焦虑型', avoidant:'回避型', disorganized:'混乱型'};
+const LS_PROGRESS = 'yilian.local.progress.v1';
+const LS_RESULT   = 'yilian.local.result.v1';
+const N = QUIZ.questions.length;
+
+// ==== CORE:START ====
+function blankScores(){ return {secure:0, anxious:0, avoidant:0, disorganized:0}; }
+
+function decide(scores){
+  const total = ORDER.reduce(function(a,k){ return a + (scores[k] || 0); }, 0);
+  const ranked = ORDER.map(function(k){
+    const s = scores[k] || 0;
+    return {type:k, score:s, pct: total ? (s / total) * 100 : 0};
+  }).sort(function(a,b){ return b.score - a.score; });
+  const gap = ranked[0].score - ranked[1].score;
+  // 接近平手也算混合：分差不超过总分 3.5%（最少 3 分）。
+  // 满分 105 分的情况下约等于 4 分以内判为混合，避免 60 比 58 这种微差被硬判成单一类型。
+  const band = Math.max(3, Math.round(total * 0.035));
+  const mixed = total > 0 && gap <= band;
+  return {
+    scores: {secure:scores.secure||0, anxious:scores.anxious||0, avoidant:scores.avoidant||0, disorganized:scores.disorganized||0},
+    total: total,
+    ranked: ranked,
+    gap: gap,
+    band: band,
+    mixed: mixed,
+    type: mixed ? 'mixed' : ranked[0].type,
+    dominant: mixed ? ranked[0].type : null
+  };
+}
+
+function scoreAnswers(answers){
+  const s = blankScores();
+  QUIZ.questions.forEach(function(q, i){
+    const choice = answers[i];
+    if (choice === null || choice === undefined) return;
+    const opt = q.options[choice];
+    if (!opt) return;
+    ORDER.forEach(function(k){ s[k] += opt.scores[k] || 0; });
+  });
+  return decide(s);
+}
+
+function encodeScores(scores){
+  return ORDER.map(function(k){ return Math.max(0, Math.round(scores[k] || 0)).toString(36); }).join('-');
+}
+
+function decodeScores(str){
+  if (!str) return null;
+  const parts = str.split('-');
+  if (parts.length !== 4) return null;
+  const out = blankScores();
+  for (let i = 0; i < 4; i++){
+    if (!/^[0-9a-z]+$/.test(parts[i])) return null;
+    const v = parseInt(parts[i], 36);
+    // 单题最多给某一类型加 3 分，超过上限的值一律视为无效链接
+    if (!Number.isFinite(v) || v < 0 || v > 3 * QUIZ.questions.length) return null;
+    out[ORDER[i]] = v;
+  }
+  return out;
+}
+// ==== CORE:END ====
+
+/* ---------- 本机存储（localStorage 不可用时自动降级为内存） ---------- */
+const mem = {};
+const store = {
+  get: function(key){
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return Object.prototype.hasOwnProperty.call(mem, key) ? mem[key] : null;
+  },
+  set: function(key, val){
+    mem[key] = val;
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch (e) { return false; }
+  },
+  del: function(key){
+    delete mem[key];
+    try { localStorage.removeItem(key); } catch (e) {}
+  }
+};
+
+/* ---------- 图标 ---------- */
+const ICONS = {
+  secure: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+  anxious: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  avoidant: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  disorganized: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/>',
+  mixed: '<path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 17l10 5 10-5"/>'
+};
+function svgIcon(type, stroke){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="' + stroke + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[type] || ICONS.secure) + '</svg>';
+}
+
+/* ---------- 状态 ---------- */
+let answers = new Array(N).fill(null);
+let index = 0;
+let result = null;       // 当前展示的结果对象
+let resultFrom = 'local';// local | link
+
+const $ = function(id){ return document.getElementById(id); };
+const screens = {
+  home: $('screen-home'),
+  test: $('screen-test'),
+  result: $('screen-result')
+};
+function show(name){
+  Object.keys(screens).forEach(function(k){ screens[k].classList.toggle('active', k === name); });
+  window.scrollTo({top:0, behavior:'auto'});
+}
+
+/* ---------- 首页 ---------- */
+function renderHome(){
+  const grid = $('type-grid');
+  const order = ['secure','anxious','avoidant','disorganized'];
+  grid.innerHTML = order.map(function(k){
+    const r = QUIZ.results[k];
+    const hue = r.color.match(/hsl\(([^)]+)\)/);
+    const c = hue ? 'hsl(' + hue[1] + ')' : '#2563eb';
+    return '<div class="type">' +
+      '<div class="ico" style="background:' + c.replace('hsl(', 'hsla(').replace(')', ', .12)') + '">' + svgIcon(k, c) + '</div>' +
+      '<b>' + r.title.replace('依恋','') + '</b>' +
+      '<span>' + r.subtitle + '</span>' +
+    '</div>';
+  }).join('');
+
+  const saved = store.get(LS_RESULT);
+  const box = $('saved-box');
+  if (saved && saved.scores){
+    const d = decide(saved.scores);
+    const r = QUIZ.results[d.type];
+    const when = saved.ts ? new Date(saved.ts) : null;
+    const stamp = when ? (when.getMonth() + 1) + '月' + when.getDate() + '日 ' + String(when.getHours()).padStart(2,'0') + ':' + String(when.getMinutes()).padStart(2,'0') : '';
+    box.innerHTML =
+      '<div class="saved">' +
+        '<span class="txt">上次结果：<b>' + r.title + '</b>' + (stamp ? '（' + stamp + '）' : '') + '</span>' +
+        '<span>' +
+          '<button class="link" id="btn-view-saved">查看结果</button>' +
+          ' · <button class="link" id="btn-clear-saved">清除</button>' +
+        '</span>' +
+      '</div>';
+    $('btn-view-saved').onclick = function(){ go('#/result'); };
+    $('btn-clear-saved').onclick = function(){
+      store.del(LS_RESULT);
+      renderHome();
+      toast('已清除本机记录');
+    };
+  } else {
+    box.innerHTML = '';
+    const prog = store.get(LS_PROGRESS);
+    if (prog && Array.isArray(prog.answers) && prog.answers.length === N){
+      const done = prog.answers.filter(function(a){ return a !== null; }).length;
+      if (done > 0){
+        box.innerHTML =
+          '<div class="saved">' +
+            '<span class="txt">上次没答完：已答 <b>' + done + ' / ' + N + '</b> 题</span>' +
+            '<span>' +
+              '<button class="link" id="btn-resume">继续作答</button>' +
+              ' · <button class="link" id="btn-restart">重新开始</button>' +
+            '</span>' +
+          '</div>';
+        $('btn-resume').onclick = function(){ go('#/test'); };
+        $('btn-restart').onclick = function(){
+          resetTest();
+          renderHome();
+          toast('已清空进度，可以重新开始');
+        };
+      }
+    }
+  }
+}
+
+/* ---------- 答题 ---------- */
+function loadProgress(){
+  const p = store.get(LS_PROGRESS);
+  if (p && Array.isArray(p.answers) && p.answers.length === N){
+    answers = p.answers.map(function(v){ return (typeof v === 'number' && v >= 0 && v < 4) ? v : null; });
+    index = Math.min(Math.max(0, p.index | 0), N - 1);
+    return true;
+  }
+  return false;
+}
+function saveProgress(){
+  store.set(LS_PROGRESS, {answers: answers.slice(), index: index, ts: Date.now()});
+}
+function resetTest(){
+  answers = new Array(N).fill(null);
+  index = 0;
+  store.del(LS_PROGRESS);
+}
+
+function renderTest(){
+  const q = QUIZ.questions[index];
+  $('q-counter').textContent = '第 ' + (index + 1) + ' 题 / 共 ' + N + ' 题';
+  const answered = answers.filter(function(a){ return a !== null; }).length;
+  const pct = Math.round((answered / N) * 100);
+  $('q-pct').textContent = pct + '%';
+  $('q-fill').style.width = pct + '%';
+
+  $('q-num').textContent = '问题 ' + (index + 1);
+  $('q-text').textContent = q.text;
+
+  const list = $('q-opts');
+  list.innerHTML = q.options.map(function(opt, i){
+    return '<li><button type="button" class="opt" role="radio" aria-checked="' + (answers[index] === i) + '" data-i="' + i + '">' +
+      '<span class="dot" aria-hidden="true"></span><span>' + opt.text + '</span></button></li>';
+  }).join('');
+
+  Array.prototype.forEach.call(list.querySelectorAll('.opt'), function(btn){
+    btn.onclick = function(){
+      answers[index] = Number(btn.dataset.i);
+      saveProgress();
+      $('q-hint').textContent = '';
+      renderTest();
+    };
+  });
+
+  $('btn-prev').disabled = index === 0;
+  const last = index === N - 1;
+  $('btn-next').textContent = last ? '提交测试' : '下一题';
+  $('q-hint').textContent = '';
+}
+
+function next(){
+  if (answers[index] === null){
+    $('q-hint').textContent = '请先选择一个答案再继续';
+    return;
+  }
+  if (index < N - 1){
+    index += 1;
+    saveProgress();
+    renderTest();
+    return;
+  }
+  submit();
+}
+
+function submit(){
+  const missing = answers.findIndex(function(a){ return a === null; });
+  if (missing !== -1){
+    index = missing;
+    renderTest();
+    $('q-hint').textContent = '请完成所有题目后再提交（第 ' + (missing + 1) + ' 题还没有作答）';
+    return;
+  }
+  const r = scoreAnswers(answers);
+  const payload = {scores: r.scores, ts: Date.now()};
+  const persisted = store.set(LS_RESULT, payload);
+  store.del(LS_PROGRESS);
+  renderResultFromScores(r.scores, 'local');
+  show('result');
+  setHash('#/result');
+  if (!persisted) toast('本机存储被浏览器禁用，刷新后结果会丢，请点“复制结果链接”保存');
+}
+
+/* ---------- 结果 ---------- */
+function renderResultFromScores(scores, from){
+  const d = decide(scores);
+  const info = QUIZ.results[d.type];
+  const color = info.color;
+  result = d;
+  resultFrom = from;
+
+  const head = $('res-head');
+  head.style.borderColor = color;
+  $('res-ico').style.background = color.replace('hsl(', 'hsla(').replace(')', ', .14)');
+  $('res-ico').innerHTML = svgIcon(d.type, color);
+  $('res-title').textContent = info.title;
+  $('res-sub').textContent = info.subtitle;
+
+  const dom = $('res-dominant');
+  if (d.mixed && d.dominant){
+    dom.innerHTML = '<span class="dominant">得分最接近「' + SHORT[d.dominant] + '」（' + d.scores[d.dominant] + ' 分），但各类型差距不大</span>';
+  } else {
+    dom.innerHTML = '';
+  }
+
+  $('res-bars').innerHTML = d.ranked.map(function(row){
+    const r = QUIZ.results[row.type];
+    return '<div class="bar-row" style="--c:' + r.color + '">' +
+      '<div class="top"><span>' + SHORT[row.type] + '</span><span class="val">' + row.score + ' 分（' + Math.round(row.pct) + '%）</span></div>' +
+      '<div class="track"><div class="fill" style="width:' + (d.total ? (row.score / d.total * 100) : 0) + '%"></div></div>' +
+    '</div>';
+  }).join('');
+
+  $('res-desc').textContent = info.description;
+  $('res-feats').innerHTML = info.characteristics.map(function(t){ return '<li>' + t + '</li>'; }).join('');
+  $('res-sugg').innerHTML = info.suggestions.map(function(t){ return '<li>' + t + '</li>'; }).join('');
+}
+
+function renderResultFromHash(hash){
+  const m = /^#\/result(?:\/([0-9a-z\-]+))?$/i.exec(hash || '');
+  if (m){
+    if (m[1]){
+      const scores = decodeScores(m[1]);
+      if (scores){
+        renderResultFromScores(scores, 'link');
+        show('result');
+        return true;
+      }
+    }
+    const saved = store.get(LS_RESULT);
+    if (saved && saved.scores){
+      renderResultFromScores(saved.scores, 'local');
+      show('result');
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ---------- 路由 ---------- */
+function setHash(h){
+  if (location.hash !== h) location.hash = h;
+}
+function go(h){
+  setHash(h);
+  route();
+}
+function route(){
+  const h = location.hash || '';
+  if (h.indexOf('#/result') === 0){
+    if (!renderResultFromHash(h)) go('#/');
+    return;
+  }
+  if (h.indexOf('#/test') === 0){
+    const resumed = loadProgress();
+    renderTest();
+    show('test');
+    if (resumed && answers.filter(function(a){ return a !== null; }).length > 0){
+      toast('已恢复上次答题进度');
+    }
+    return;
+  }
+  renderHome();
+  show('home');
+}
+
+/* ---------- 杂项 ---------- */
+let toastTimer = null;
+function toast(msg){
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 2200);
+}
+
+function copyText(text){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text).then(function(){ return true; }, function(){ return legacyCopy(text); });
+  }
+  return Promise.resolve(legacyCopy(text));
+}
+function legacyCopy(text){
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch (e) { return false; }
+}
+
+/* ---------- 事件 ---------- */
+$('btn-start').onclick = function(){
+  const p = store.get(LS_PROGRESS);
+  if (p && Array.isArray(p.answers) && p.answers.some(function(a){ return a !== null; })){
+    // 有未完成的进度：从上次的位置继续
+    go('#/test');
+    return;
+  }
+  resetTest();
+  go('#/test');
+};
+$('btn-prev').onclick = function(){
+  if (index > 0){ index -= 1; saveProgress(); renderTest(); }
+};
+$('btn-next').onclick = next;
+$('btn-quit').onclick = function(){
+  saveProgress();
+  go('#/');
+};
+$('btn-again').onclick = function(){
+  resetTest();
+  store.del(LS_RESULT);
+  go('#/test');
+};
+$('btn-home').onclick = function(){ go('#/'); };
+$('btn-share').onclick = function(){
+  const scores = result ? result.scores : (store.get(LS_RESULT) || {}).scores;
+  if (!scores) return;
+  // file:// 打开时 location.origin 是 "null"，直接拼会得到坏链接
+  const base = (location.protocol === 'file:' || location.origin === 'null')
+    ? location.href.split('#')[0]
+    : location.origin + location.pathname + location.search;
+  const url = base + '#/result/' + encodeScores(scores);
+  copyText(url).then(function(ok){ toast(ok ? '结果链接已复制，打开即看结果' : '复制失败，可手动复制地址栏链接'); });
+};
+
+document.addEventListener('keydown', function(e){
+  if (!screens.test.classList.contains('active')) return;
+  if (e.key === 'ArrowLeft'){ $('btn-prev').click(); }
+  else if (e.key === 'ArrowRight'){ $('btn-next').click(); }
+  else if (/^[1-4]$/.test(e.key)){
+    const btns = document.querySelectorAll('#q-opts .opt');
+    const b = btns[Number(e.key) - 1];
+    if (b) b.click();
+  }
+});
+
+/* ---------- 安装为独立应用（PWA） ---------- */
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  deferredInstall = e;
+  const b = $('btn-install');
+  if (b) b.hidden = false;
+});
+$('btn-install').onclick = function(){
+  if (!deferredInstall){
+    toast('这个浏览器不支持一键安装，可用菜单里的「安装应用 / 添加到主屏幕」');
+    return;
+  }
+  deferredInstall.prompt();
+  deferredInstall.userChoice.then(function(){
+    deferredInstall = null;
+    $('btn-install').hidden = true;
+  });
+};
+window.addEventListener('appinstalled', function(){ toast('已安装，之后可从桌面图标直接打开'); });
+
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+
+window.addEventListener('hashchange', route);
+route();
+})();
+</script>
+</body>
+</html>
